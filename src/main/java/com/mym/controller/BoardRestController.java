@@ -110,7 +110,16 @@ public class BoardRestController {
                 .roles(Set.of(MemberRoles.USER))
                 .build();
 
+        Member testAdmin =  Member.builder()
+                .username("testAdmin")
+                .password(passwordEncoder.encode("pass"))
+                .roles(Set.of(MemberRoles.ADMIN))
+                .build();
+
+
         memberRepository.save(testMember);
+        memberRepository.save(testAdmin);
+
 
         for(int i=1; i<40; i++ ) {
 
