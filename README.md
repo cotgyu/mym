@@ -57,7 +57,11 @@
 
 		-	h2 생성 참고 https://www.inflearn.com/questions/22054
 		-	./h2.sh 실행 (처음에 실행하면 admin 권한으로 디비생성가능)
-		-	jdbc:h2:~/mym , jdbc:h2:~/mym-test 를 사용해 mym, mym-test 생성
+		
+			~~~	
+			jdbc:h2:~/mym , jdbc:h2:~/mym-test 를 사용해 mym, mym-test 생성
+			~~~
+		
 		-	이후 h2 웹에서 jdbc:h2:tcp://localhost/~/mym 으로 접속
 
 	-	Run/Debug Configurations
