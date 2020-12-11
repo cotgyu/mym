@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout/main">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>List</title>
+
+    <link rel="stylesheet" href="/css/lib/bootstrap.min.css">
+</head>
+<body>
+
+<th:block th:if="not ${#lists.isEmpty(boardList)}">
+
+<div th:each="board : ${boardList}">
+    <h3 th:text="'글 번호 : '+${board.seq}+'/ 제목: '+${board.title}"></h3>
+</div>
+
+</th:block>
+
+
+<!--부트스트랩 js, jquery 추가-->
+<script src="/js/lib/jquery.min.js"></script>
+<script src="/js/lib/bootstrap.min.js"></script>
+
+<!--custom js 추가-->
+<script src="/js/app/main.js"></script>
+</body>
+</html>

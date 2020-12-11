@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout/main">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+
+    <link rel="stylesheet" href="/css/lib/bootstrap.min.css">
+</head>
+<body>
+
+<input id="loginUsername" placeholder="이름" style="width: 240px;">
+<br>
+<input type="password" id="loginPassword" placeholder="비밀번호" style="width: 240px;">
+<br>
+<button type="submit" onclick="login();" style="width: 240px;" >로그인</button>
+
+
+
+<!--부트스트랩 js, jquery 추가-->
+<script src="/js/lib/jquery.min.js"></script>
+<script src="/js/lib/bootstrap.min.js"></script>
+
+<!--custom js 추가-->
+<script src="/js/app/main.js"></script>
+<script type ="text/javascript">
+    function login(){
+
+        var username = $("#loginUsername").val();
+        var password = $("#loginPassword").val();
+
+
+        $.ajax({
+            url:"/loginProcess",
+            type:"post",
+            data:"username="+username+"&password="+password,
+            dataType:"json",
+            success:function(data){
+                if(data == true){
+                    location.href="/board/list/1";
+                }
+                else{
+                    alert(' 로그인 오류 : 입력하신 이름이나 비밀번호가 맞지 않습니다.');
+                    return false;
+                }
+            },
+            error:function(error){
+
+                alert(' 로그인 오류 : 에러');
+                return false;
+            }
+        });
+
+    }
+
+
+</script>
+</body>
+</html>
