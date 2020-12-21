@@ -38,7 +38,7 @@ public class RiotApiTest {
     protected ObjectMapper objectMapper;
 
     // 개발용이라 하루짜리
-    protected static final String apiKey = "RGAPI-9e4aff6a-c106-42bb-b844-b5fa9bda3be6";
+    protected static final String apiKey = "RGAPI-2bd2871c-0fcb-4b93-8aa0-e1615763fda2";
 
     @Test
     @Description("챔피언 로테이션 api 호출이 되는 지 확인한다.")
@@ -111,9 +111,10 @@ public class RiotApiTest {
 
         Object[] objects = responseSet.toArray();
         JSONArray jsonArray = new JSONArray(objects);
-        System.out.println(jsonArray);
+        //System.out.println(jsonArray);
         JSONObject getFirst = (JSONObject) jsonArray.get(0);
 
+        System.out.println(getFirst);
         assertThat(getFirst.get("tier")).isEqualTo(tier);
 
     }
