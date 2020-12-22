@@ -1,6 +1,7 @@
 package com.mym.sk;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mym.sk.web.dto.LeagueEntrySaveDto;
 import jdk.jfr.Description;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -15,10 +16,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.InstanceOfAssertFactories.map;
@@ -38,7 +36,7 @@ public class RiotApiTest {
     protected ObjectMapper objectMapper;
 
     // 개발용이라 하루짜리
-    protected static final String apiKey = "RGAPI-2bd2871c-0fcb-4b93-8aa0-e1615763fda2";
+    protected static final String apiKey = "RGAPI-710b75a3-02fd-492c-924b-8bbb96fd06d7";
 
     @Test
     @Description("챔피언 로테이션 api 호출이 되는 지 확인한다.")
