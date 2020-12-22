@@ -1,6 +1,7 @@
 package com.mym.base.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,5 +20,8 @@ public class AppConfig {
 
     @Bean
     public ObjectMapper objectMapper() {return new ObjectMapper();}
+
+    @Bean
+    public Gson gson() {return new Gson();}
 
 }

@@ -1,12 +1,9 @@
 package com.mym.sk.service.leagueEntry;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mym.sk.domains.leagueEntry.LeagueEntry;
 import com.mym.sk.domains.leagueEntry.LeagueEntryRepository;
-import com.mym.sk.domains.summoner.SummonerRepository;
 import com.mym.sk.web.dto.LeagueEntrySaveDto;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -16,9 +13,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,7 +28,7 @@ public class LeagueEntryService {
     protected static final String apiKey = "RGAPI-710b75a3-02fd-492c-924b-8bbb96fd06d7";
 
 
-    public Set getDataSetFromRiotApi(URI url){
+    public String getJsonDateFromRiotApi(URI url){
 
         // riot api는 헤더에만 키만 넣고 있어서 파라미터는 불필요
         MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
@@ -44,7 +39,8 @@ public class LeagueEntryService {
 
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<MultiValueMap<String, String>>(parameters, headers);
 
-        ResponseEntity<Set> responseEntity = restTemplate.exchange(url, HttpMethod.GET, requestEntity, Set.class);
+
+        ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
 
         return responseEntity.getBody();
 

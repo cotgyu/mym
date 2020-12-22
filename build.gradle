@@ -34,7 +34,7 @@ dependencies {
 	compile("com.querydsl:querydsl-jpa:4.2.2")
 	compile("com.querydsl:querydsl-apt:4.2.2")
 	compile group: 'org.modelmapper', name: 'modelmapper', version: '2.3.1'
-
+	implementation 'com.google.code.gson:gson:2.8.2'
 	testImplementation('org.springframework.boot:spring-boot-starter-test') {
 		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
 	}
