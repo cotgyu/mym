@@ -1,4 +1,4 @@
-package com.mym.yd.dto;
+package com.mym.yd.web.dto;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

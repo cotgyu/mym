@@ -1,12 +1,11 @@
-package com.mym.yd.dto;
+package com.mym.yd.web.dto;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class LeagueEntryDTO {
+public class SummonerResponseDto {
     private String leagueId;
     private String summonerId;
     private String summonerName;
