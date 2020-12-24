@@ -32,12 +32,17 @@ public class SummonerService {
 
     }
 
+    
     public ArrayList<YdSummoner> getleagueEntryDTOArrayList(String summonerUrl) {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         HttpEntity<?> entity = new HttpEntity<>(headers);
         ObjectMapper mapper = new ObjectMapper();
 
+        /**
+        * @author yd @since 2020-12-24 오후 4:46 
+        * ObjectMapper 클래스 설정에 반환값에 없는 값은 처리하지 않도록 FAIL_ON_UNKNOWN_PROPERTIES , false로 설정 후 진행
+        */
         return mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,false).convertValue(
                 new ArrayList(
                         restTemplate.exchange(UriComponentsBuilder.fromHttpUrl(summonerUrl).build().toString(), HttpMethod.GET, entity, Set.class).getBody()
