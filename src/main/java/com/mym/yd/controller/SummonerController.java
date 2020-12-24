@@ -1,6 +1,7 @@
 package com.mym.yd.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.mym.yd.domain.summoner.YdSummoner;
 import com.mym.yd.web.dto.SummonerResponseDto;
 import com.mym.yd.service.summoner.SummonerService;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +40,7 @@ public class SummonerController {
          * 페이지는 최초 1페이지 호출 후 반환된 건수가 205건이 되지 않으면 미호출, 205건이면 다음페이지로 호출
          */
 
-        ArrayList<SummonerResponseDto> leagueEntryDTOArrayList =
+        ArrayList<YdSummoner> leagueEntryDTOArrayList =
                 summonerService.getleagueEntryDTOArrayList(
                         summonerService.getSummonerUrl(riotUrl, ranked, tier, queue, page, apiKey));
 
@@ -48,9 +49,10 @@ public class SummonerController {
 
     @GetMapping("/insertSummoner")
     public String insertSummoner() {
-        ArrayList<SummonerResponseDto> leagueEntryDTOArrayList =
+        ArrayList<YdSummoner> leagueEntryDTOArrayList =
                 summonerService.getleagueEntryDTOArrayList(
                         summonerService.getSummonerUrl(riotUrl, ranked, tier, queue, page, apiKey));
+
         summonerService.saveAll(leagueEntryDTOArrayList);
         return "";
     }

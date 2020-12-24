@@ -1,13 +1,11 @@
 package com.mym.yd.domain.summoner;
 
+import com.mym.yd.web.dto.MiniSeriesDTO;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Getter
 @NoArgsConstructor
