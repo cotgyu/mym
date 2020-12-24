@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.json.JsonParser;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,8 +20,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.lang.reflect.Type;
+import java.net.URI;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -45,7 +48,8 @@ public class RiotApiTest {
 
 
     // 개발용이라 하루짜리
-    protected static final String apiKey = "RGAPI-710b75a3-02fd-492c-924b-8bbb96fd06d7";
+    @Value("${riot_apiKey}")
+    private String apiKey;
 
     @Test
     @Description("챔피언 로테이션 api 호출이 되는 지 확인한다.")
@@ -115,6 +119,13 @@ public class RiotApiTest {
 
         assertThat(responseSet.size()).isNotNegative();
 
+        ObjectMapper mapper = new ObjectMapper();
+
+        ArrayList<LeagueEntrySaveDto> dto = mapper.convertValue(
+                new ArrayList(
+                        responseSet
+                ), new TypeReference<ArrayList<LeagueEntrySaveDto>>() {});
+
 
         Object[] objects = responseSet.toArray();
         JSONArray jsonArray = new JSONArray(objects);
@@ -133,16 +144,28 @@ public class RiotApiTest {
         // https://kr.api.riotgames.com/lol/league/v4/entries/RANKED_SOLO_5x5/DIAMOND/I?page=1
 
         // given
-        String url ="https://kr.api.riotgames.com/lol/league/v4/entries";
+        String url ="https://kr.api.riotgames.com/lol/league/v4/entries/{queue}/{tier}/{division}";
 
         String division = "I";
         String tier = "DIAMOND";
         String queue = "RANKED_SOLO_5x5";
-        String slash = "/";
-        String pageParam = "?page=1";
 
 
-        url = url + slash + queue + slash + tier + slash + division + pageParam;
+        Map<String, String> pathParams = new HashMap<>();
+        pathParams.put("queue", queue);
+        pathParams.put("tier", tier);
+        pathParams.put("division", division);
+
+        // queryparam 설정
+        MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+        queryParams.add("page", "2");
+
+
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(url)
+                .queryParams(queryParams);
+
+        URI uri = builder.buildAndExpand(pathParams).encode().toUri();
+
 
         RestTemplate restTemplate = new RestTemplate();
 
@@ -155,7 +178,7 @@ public class RiotApiTest {
 
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<MultiValueMap<String, String>>(parameters, headers);
 
-        ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
+        ResponseEntity<String> responseEntity = restTemplate.exchange(uri, HttpMethod.GET, requestEntity, String.class);
 
 
         // then
