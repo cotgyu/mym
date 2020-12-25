@@ -8,6 +8,8 @@ import com.mym.sk.service.leagueEntry.LeagueEntryService;
 import com.mym.sk.web.dto.LeagueEntrySaveDto;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.TypeToken;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -22,6 +24,7 @@ import java.util.*;
 
 @Controller
 @RequiredArgsConstructor
+@PropertySource("classpath:riotApiRequestURL.properties")
 @RequestMapping("/league")
 public class LeagueEntryCallApiController {
 
@@ -29,32 +32,32 @@ public class LeagueEntryCallApiController {
 
     private final Gson gson;
 
+    @Value("${riot_leagueEntriesURL}")
+    private String riot_leagueEntriesURL;
 
-    // TODO 조회 파라미터 입력받기 (pathparam or requestdto)
     @RequestMapping("/entries")
     public ResponseEntity entriesApiCall(){
         Map<String, Object> resultMap = new HashMap<>();
 
-        // TODO url 생성 공통유틸? 만들기
-        String url ="https://kr.api.riotgames.com/lol/league/v4/entries";
-
+        // TODO 조회 파라미터 입력받기 (pathparam or requestdto)
         String division = "I";
         String tier = "DIAMOND";
         String queue = "RANKED_SOLO_5x5";
-        String slash = "/";
 
-        url = url + slash + queue + slash + tier + slash + division ;
+        // path 파라미터
+        Map<String, String> pathParams = new HashMap<>();
+        pathParams.put("queue", queue);
+        pathParams.put("tier", tier);
+        pathParams.put("division", division);
 
-        // queryparam 설정
+        // query 파라미터
         MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
         queryParams.add("page", "2");
 
-        URI uri = UriComponentsBuilder.fromUriString(url)
-                .queryParams(queryParams)
-                .build().encode()
-                .toUri();
+        // uri 생성 공통 메서드
+        URI uri = leagueEntryService.makeRiotApiURI(riot_leagueEntriesURL, pathParams, queryParams);
 
-
+        // api 호출 공통 메서드
         String resultData = leagueEntryService.getJsonDateFromRiotApi(uri);
 
         ArrayList<LeagueEntrySaveDto> leagueEntrySaveDtos = gson.fromJson(resultData, new TypeToken<ArrayList<LeagueEntrySaveDto>>(){}.getType());

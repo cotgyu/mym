@@ -4,28 +4,33 @@ import com.mym.sk.domains.leagueEntry.LeagueEntry;
 import com.mym.sk.domains.leagueEntry.LeagueEntryRepository;
 import com.mym.sk.web.dto.LeagueEntrySaveDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@PropertySource("classpath:riotApiRequestURL.properties")
 public class LeagueEntryService {
 
     private final LeagueEntryRepository leagueEntryRepository;
 
     private final RestTemplate restTemplate;
 
-    // TODO 반영안하는 propertie에 옮길 것
-    protected static final String apiKey = "RGAPI-710b75a3-02fd-492c-924b-8bbb96fd06d7";
+    @Value("${riot_apiKey}")
+    private String apiKey;
 
 
     public String getJsonDateFromRiotApi(URI url){
@@ -54,5 +59,13 @@ public class LeagueEntryService {
 
         return leagueEntryRepository.saveAll(collect);
 
+    }
+
+    public URI makeRiotApiURI(String url, Map<String, String> pathParams , MultiValueMap<String, String> queryParams){
+
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(url)
+                .queryParams(queryParams);
+
+        return builder.buildAndExpand(pathParams).encode().toUri();
     }
 }
