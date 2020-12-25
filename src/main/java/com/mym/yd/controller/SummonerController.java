@@ -52,8 +52,6 @@ public class SummonerController {
         ArrayList<YdSummoner> leagueEntryDTOArrayList =
                 summonerService.getleagueEntryDTOArrayList(
                         summonerService.getSummonerUrl(riotUrl, ranked, tier, queue, page, apiKey));
-
-        summonerService.saveAll(leagueEntryDTOArrayList);
-        return "";
+        return summonerService.saveAll(leagueEntryDTOArrayList);
     }
 }

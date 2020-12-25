@@ -12,6 +12,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -32,7 +33,6 @@ public class SummonerService {
 
     }
 
-    
     public ArrayList<YdSummoner> getleagueEntryDTOArrayList(String summonerUrl) {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
@@ -49,9 +49,10 @@ public class SummonerService {
                 ), new TypeReference<ArrayList<YdSummoner>>() {});
     }
 
-    public void saveAll(ArrayList<YdSummoner> leagueEntryDTOArrayList) {
+    @Transactional
+    public String saveAll(ArrayList<YdSummoner> leagueEntryDTOArrayList) {
         List list = new ArrayList(leagueEntryDTOArrayList);
-        ydSummonerRepository.saveAll(list);
+        return "소환사 정보" + ydSummonerRepository.saveAll(list).size() + "건 등록 완료";
     }
 
 }

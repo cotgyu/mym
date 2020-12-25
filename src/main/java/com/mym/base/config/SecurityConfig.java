@@ -18,7 +18,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(WebSecurity web) throws Exception {
 
-        web.ignoring().antMatchers("/resources/**","resources/**");
+        web.ignoring().antMatchers("/resources/**","resources/**","/summoner/**");
         web.ignoring().requestMatchers(PathRequest.toStaticResources().atCommonLocations());
 
     }
