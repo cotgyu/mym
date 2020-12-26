@@ -21,24 +21,20 @@ public class SummonerResponseDto {
     private boolean veteran;
     private boolean freshBlood;
     private boolean inactive;
-    private MiniSeriesDTO miniSeries;
 
-    public YdSummoner toEntity() {
-        return YdSummoner.builder()
-                .summonerId(summonerId)
-                .leagueId(leagueId)
-                .summonerName(summonerName)
-                .queueType(queueType)
-                .tier(tier)
-                .rank(rank)
-                .leaguePoints(leaguePoints)
-                .wins(wins)
-                .losses(losses)
-                .hotStreak(hotStreak)
-                .veteran(veteran)
-                .freshBlood(freshBlood)
-                .inactive(inactive)
-                .build();
+    public SummonerResponseDto(YdSummoner entity) {
+        this.leagueId = entity.getLeagueId();
+        this.summonerId = entity.getSummonerId();
+        this.summonerName = entity.getSummonerName();
+        this.queueType = entity.getQueueType();
+        this.tier = entity.getTier();
+        this.rank = entity.getRank();
+        this.leaguePoints = entity.getLeaguePoints();
+        this.wins = entity.getWins();
+        this.losses = entity.getLosses();
+        this.hotStreak = entity.isHotStreak();
+        this.veteran = entity.isVeteran();
+        this.freshBlood = entity.isFreshBlood();
+        this.inactive = entity.isInactive();
     }
-
 }

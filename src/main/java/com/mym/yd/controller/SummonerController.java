@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -50,6 +51,11 @@ public class SummonerController {
         /*return leagueEntryDTOArrayList.size()!=0?"성공":"실패";*/
 
         return "로그창에 URL찍기 테스트";
+    }
+
+    @PostMapping("/selectOneSummoner")
+    public SummonerResponseDto selectOneSummoner() {
+          return summonerService.findByName("야 뚱");
     }
 
     @GetMapping("/insertSummoner")

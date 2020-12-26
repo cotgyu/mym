@@ -16,10 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -55,4 +52,8 @@ public class SummonerService {
         return "소환사 정보" + ydSummonerRepository.saveAll(list).size() + "건 등록 완료";
     }
 
+    public SummonerResponseDto findByName(String summonerName) {
+        YdSummoner entity = ydSummonerRepository.findByName(summonerName).orElseThrow();
+        return new SummonerResponseDto(entity);
+    }
 }
