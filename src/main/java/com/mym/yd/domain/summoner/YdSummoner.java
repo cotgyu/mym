@@ -10,7 +10,7 @@ import javax.persistence.*;
 @Getter
 @NoArgsConstructor
 @Entity
-public class YdSummoner {
+public class YdSummoner extends BaseTimeEntity {
 
     @Id
     private String summonerId;

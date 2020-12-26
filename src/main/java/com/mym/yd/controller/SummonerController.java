@@ -22,13 +22,16 @@ public class SummonerController {
 
     private final SummonerService summonerService;
     @Value("${yd-api-key}")
-    String apiKey;
+    private String apiKey;
     @Value("${yd-url}")
-    String riotUrl;
-    String ranked = "/RANKED_SOLO_5x5";
-    String tier = "/IRON";
-    String queue = "/I";
-    int page = 1;
+    private String riotUrl;
+    @Value("${yd-queue}")
+    private String queue;
+    @Value("${yd-tier}")
+    private List<String> tier;
+    @Value("${yd-division}")
+    private List<String> division;
+
 
     @GetMapping("/selectTier")
     public String findByTier() throws JsonProcessingException {
@@ -40,18 +43,22 @@ public class SummonerController {
          * 페이지는 최초 1페이지 호출 후 반환된 건수가 205건이 되지 않으면 미호출, 205건이면 다음페이지로 호출
          */
 
-        ArrayList<YdSummoner> leagueEntryDTOArrayList =
+        /*ArrayList<YdSummoner> leagueEntryDTOArrayList =
                 summonerService.getleagueEntryDTOArrayList(
-                        summonerService.getSummonerUrl(riotUrl, ranked, tier, queue, page, apiKey));
+                        summonerService.getSummonerUrl(riotUrl, queue, tier, division, 1, apiKey));*/
 
-        return leagueEntryDTOArrayList.size()!=0?"성공":"실패";
+        /*return leagueEntryDTOArrayList.size()!=0?"성공":"실패";*/
+
+        return "로그창에 URL찍기 테스트";
     }
 
     @GetMapping("/insertSummoner")
-    public String insertSummoner() {
-        ArrayList<YdSummoner> leagueEntryDTOArrayList =
-                summonerService.getleagueEntryDTOArrayList(
-                        summonerService.getSummonerUrl(riotUrl, ranked, tier, queue, page, apiKey));
-        return summonerService.saveAll(leagueEntryDTOArrayList);
+    public void insertSummoner() {
+        tier.forEach(tier -> {
+            division.forEach(division -> {
+                summonerService.saveAll(summonerService.getleagueEntryDTOArrayList(
+                        summonerService.getSummonerUrl(riotUrl, queue, tier, division, 1, apiKey)));
+            });
+        });
     }
 }

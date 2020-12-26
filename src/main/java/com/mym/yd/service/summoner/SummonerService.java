@@ -27,9 +27,9 @@ public class SummonerService {
 
     private final YdSummonerRepository ydSummonerRepository;
 
-    public String getSummonerUrl(String riotUrl, String ranked, String tier, String queue, int page, String apiKey) {
+    public String getSummonerUrl(String riotUrl, String queue, String tier, String division, int page, String apiKey) {
 
-        return riotUrl + ranked + tier + queue + "?page=" + page + "&api_key=" + apiKey;
+        return riotUrl + queue + tier + division + "?page=" + page + "&api_key=" + apiKey;
 
     }
 
