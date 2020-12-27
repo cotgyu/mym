@@ -21,8 +21,8 @@ public class CommonService {
     @Value("${riot_apiKey}")
     private String apiKey;
 
-
-    public String getJsonDateFromRiotApi(URI url){
+    // TODO 호출 에러 처리
+    public String getJsonDateFromRiotApi(URI url) {
 
         // riot api는 헤더에만 키만 넣고 있어서 파라미터는 불필요
         MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
