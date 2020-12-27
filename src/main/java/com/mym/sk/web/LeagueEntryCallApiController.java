@@ -1,10 +1,8 @@
 package com.mym.sk.web;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
-import com.mym.base.controller.BoardRestController;
 import com.mym.sk.domains.leagueEntry.LeagueEntry;
+import com.mym.sk.service.common.CommonService;
 import com.mym.sk.service.leagueEntry.LeagueEntryService;
 import com.mym.sk.service.validator.LeagueEntriesValidator;
 import com.mym.sk.web.dto.LeagueEntryRequestDto;
@@ -21,15 +19,15 @@ import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.util.UriComponentsBuilder;
 
-import java.lang.reflect.Type;
 import java.net.URI;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
@@ -40,6 +38,8 @@ public class LeagueEntryCallApiController {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private final LeagueEntryService leagueEntryService;
+
+    private final CommonService commonService;
 
     private final Gson gson;
 
@@ -72,18 +72,17 @@ public class LeagueEntryCallApiController {
         queryParams.add("page", Integer.toString(leagueEntryRequestDto.getPage()));
 
         // uri 생성 공통 메서드
-        URI uri = leagueEntryService.makeRiotApiURI(riot_leagueEntriesURL, pathParams, queryParams);
+        URI uri = commonService.makeRiotApiURI(riot_leagueEntriesURL, pathParams, queryParams);
 
         // api 호출 공통 메서드
-        String resultData = leagueEntryService.getJsonDateFromRiotApi(uri);
+        String resultData = commonService.getJsonDateFromRiotApi(uri);
 
 
         ArrayList<LeagueEntrySaveDto> leagueEntrySaveDtos = gson.fromJson(resultData, new TypeToken<ArrayList<LeagueEntrySaveDto>>(){}.getType());
 
-        // TODO 사용자 정보도 같이 조회해서 저장 필요
         List<LeagueEntry> leagueEntries = leagueEntryService.saveLeagueEntriesInfo(leagueEntrySaveDtos);
 
-        resultMap.put("result", leagueEntries);
+        resultMap.put("resultSize", leagueEntries.size());
 
         return new ResponseEntity<>(resultMap, HttpStatus.OK);
     }
