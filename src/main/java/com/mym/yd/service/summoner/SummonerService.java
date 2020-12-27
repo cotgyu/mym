@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mym.yd.domain.summoner.YdSummoner;
 import com.mym.yd.domain.summoner.YdSummonerRepository;
+import com.mym.yd.web.dto.SummonerDto;
 import com.mym.yd.web.dto.SummonerResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +27,10 @@ import java.util.*;
 public class SummonerService {
 
     private final YdSummonerRepository ydSummonerRepository;
+    private final RestTemplate restTemplate;
+    private HttpHeaders headers;
+    private final HttpEntity<?> entity = new HttpEntity<>(headers);
+    private final ObjectMapper mapper;
     @Value("${yd-api-key}")
     private String apiKey;
     @Value("${yd-entries-url}")
@@ -39,19 +44,15 @@ public class SummonerService {
     @Value("${yd-division}")
     private List<String> division;
 
-    public String getEntriesUrl() {
+    public String getEntriesUrl(String tier, String division) {
         return entriesUrl + queue + tier + division + "?page=" + 1 + "&api_key=" + apiKey;
     }
 
-    public String getOneSummonerUrl() {
-        return summonerUrl + ""
+    public String getOneSummonerUrl(String summonerName) {
+        return summonerUrl + "/" + summonerName + "?api_key=" + apiKey;
     }
 
     public ArrayList<YdSummoner> getleagueEntryDTOArrayList(String summonerUrl) {
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        HttpEntity<?> entity = new HttpEntity<>(headers);
-        ObjectMapper mapper = new ObjectMapper();
 
         /**
         * @author yd @since 2020-12-24 오후 4:46 
@@ -63,20 +64,31 @@ public class SummonerService {
                 ), new TypeReference<ArrayList<YdSummoner>>() {});
     }
 
+    public SummonerDto getSummonerDto(String url) {
+        return restTemplate.exchange(UriComponentsBuilder.fromHttpUrl(url).build().toString(), HttpMethod.GET, entity, SummonerDto.class).getBody();
+    }
+
     @Transactional
-    public String saveAll(ArrayList<YdSummoner> leagueEntryDTOArrayList) {
-        List list = new ArrayList(leagueEntryDTOArrayList);
-        return "소환사 정보" + ydSummonerRepository.saveAll(list).size() + "건 등록 완료";
+    public String saveAll() {
+        tier.forEach(tier -> {
+            division.forEach(division -> {
+                System.out.println(getEntriesUrl(tier, division));
+                List list = new ArrayList(getleagueEntryDTOArrayList(getEntriesUrl(tier, division)));
+                ydSummonerRepository.saveAll(list);
+            });
+        });
+        return "입력완료";
     }
 
     public SummonerResponseDto findByName(String summonerName) {
         YdSummoner entity = ydSummonerRepository.findByName(summonerName).orElseGet(() ->
-                selectAndInsert()
+                insertAndSelectSummoner(summonerName)
         );
         return new SummonerResponseDto(entity);
     }
 
-    public YdSummoner selectAndInsert() {
+    public YdSummoner insertAndSelectSummoner(String summonerName) {
+        getSummonerDto(getOneSummonerUrl(summonerName)).getName();
         return new YdSummoner();
     }
 
