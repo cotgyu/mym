@@ -8,6 +8,8 @@ import com.mym.yd.domain.summoner.YdSummoner;
 import com.mym.yd.domain.summoner.YdSummonerRepository;
 import com.mym.yd.web.dto.SummonerResponseDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -18,16 +20,31 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.*;
 
+@PropertySource("classpath:yd-api-info.properties")
 @Service
 @RequiredArgsConstructor
 public class SummonerService {
 
     private final YdSummonerRepository ydSummonerRepository;
+    @Value("${yd-api-key}")
+    private String apiKey;
+    @Value("${yd-entries-url}")
+    private String entriesUrl;
+    @Value("${yd-summoner-url}")
+    private String summonerUrl;
+    @Value("${yd-queue}")
+    private String queue;
+    @Value("${yd-tier}")
+    private List<String> tier;
+    @Value("${yd-division}")
+    private List<String> division;
 
-    public String getSummonerUrl(String riotUrl, String queue, String tier, String division, int page, String apiKey) {
+    public String getEntriesUrl() {
+        return entriesUrl + queue + tier + division + "?page=" + 1 + "&api_key=" + apiKey;
+    }
 
-        return riotUrl + queue + tier + division + "?page=" + page + "&api_key=" + apiKey;
-
+    public String getOneSummonerUrl() {
+        return summonerUrl + ""
     }
 
     public ArrayList<YdSummoner> getleagueEntryDTOArrayList(String summonerUrl) {
@@ -53,7 +70,14 @@ public class SummonerService {
     }
 
     public SummonerResponseDto findByName(String summonerName) {
-        YdSummoner entity = ydSummonerRepository.findByName(summonerName).orElseThrow();
+        YdSummoner entity = ydSummonerRepository.findByName(summonerName).orElseGet(() ->
+                selectAndInsert()
+        );
         return new SummonerResponseDto(entity);
     }
+
+    public YdSummoner selectAndInsert() {
+        return new YdSummoner();
+    }
+
 }

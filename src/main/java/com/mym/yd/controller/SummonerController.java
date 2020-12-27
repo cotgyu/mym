@@ -63,7 +63,7 @@ public class SummonerController {
         tier.forEach(tier -> {
             division.forEach(division -> {
                 summonerService.saveAll(summonerService.getleagueEntryDTOArrayList(
-                        summonerService.getSummonerUrl(riotUrl, queue, tier, division, 1, apiKey)));
+                        summonerService.getEntriesUrl()));
             });
         });
     }
