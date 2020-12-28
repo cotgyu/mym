@@ -52,6 +52,10 @@ public class SummonerService {
         return summonerUrl + "/" + summonerName + "?api_key=" + apiKey;
     }
 
+    public String getOneSummonerInfoUrl(String encryptedSummonerId) {
+        return summonerUrl + "/by-summoner/" + encryptedSummonerId + "&api_key=" + apiKey;
+    }
+
     public ArrayList<YdSummoner> getleagueEntryDTOArrayList(String summonerUrl) {
 
         /**
@@ -68,11 +72,14 @@ public class SummonerService {
         return restTemplate.exchange(UriComponentsBuilder.fromHttpUrl(url).build().toString(), HttpMethod.GET, entity, SummonerDto.class).getBody();
     }
 
+    public YdSummoner getYdSummoner(String url) {
+        return restTemplate.exchange(UriComponentsBuilder.fromHttpUrl(url).build().toString(), HttpMethod.GET, entity, YdSummoner.class).getBody();
+    }
+
     @Transactional
     public String saveAll() {
         tier.forEach(tier -> {
             division.forEach(division -> {
-                System.out.println(getEntriesUrl(tier, division));
                 List list = new ArrayList(getleagueEntryDTOArrayList(getEntriesUrl(tier, division)));
                 ydSummonerRepository.saveAll(list);
             });
@@ -88,8 +95,7 @@ public class SummonerService {
     }
 
     public YdSummoner insertAndSelectSummoner(String summonerName) {
-        getSummonerDto(getOneSummonerUrl(summonerName)).getName();
-        return new YdSummoner();
+        return getYdSummoner(getOneSummonerInfoUrl(getSummonerDto(getOneSummonerUrl(summonerName)).getId()));
     }
 
 }
