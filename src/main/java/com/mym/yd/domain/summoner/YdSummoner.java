@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+@IdClass(YdSummonerId.class)
 @Getter
 @NoArgsConstructor
 @Entity
@@ -14,9 +15,10 @@ public class YdSummoner extends BaseTimeEntity {
 
     @Id
     private String summonerId;
+    @Id
+    private String queueType;
     private String leagueId;
     private String summonerName;
-    private String queueType;
     private String tier;
     private String rank;
     private int leaguePoints;

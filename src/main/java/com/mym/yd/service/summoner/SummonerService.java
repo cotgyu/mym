@@ -38,13 +38,13 @@ public class SummonerService {
     @Value("${yd-summoner-url}")
     private String summonerUrl;
     @Value("${yd-queue}")
-    private String queue;
+    private List<String> queue;
     @Value("${yd-tier}")
     private List<String> tier;
     @Value("${yd-division}")
     private List<String> division;
 
-    public String getEntriesUrl(String tier, String division) {
+    public String getEntriesUrl(String queue, String tier, String division) {
         return entriesUrl + queue + tier + division + "?page=" + 1 + "&api_key=" + apiKey;
     }
 
@@ -52,8 +52,8 @@ public class SummonerService {
         return summonerUrl + "/" + summonerName + "?api_key=" + apiKey;
     }
 
-    public String getOneSummonerInfoUrl(String encryptedSummonerId) {
-        return summonerUrl + "/by-summoner/" + encryptedSummonerId + "&api_key=" + apiKey;
+    public String getSummonerInfoUrl(String encryptedSummonerId) {
+        return entriesUrl + "/by-summoner/" + encryptedSummonerId + "?api_key=" + apiKey;
     }
 
     public ArrayList<YdSummoner> getleagueEntryDTOArrayList(String summonerUrl) {
@@ -78,10 +78,12 @@ public class SummonerService {
 
     @Transactional
     public String saveAll() {
-        tier.forEach(tier -> {
-            division.forEach(division -> {
-                List list = new ArrayList(getleagueEntryDTOArrayList(getEntriesUrl(tier, division)));
-                ydSummonerRepository.saveAll(list);
+        queue.forEach(queue -> {
+            tier.forEach(tier -> {
+                division.forEach(division -> {
+                    List list = new ArrayList(getleagueEntryDTOArrayList(getEntriesUrl(queue, tier, division)));
+                    ydSummonerRepository.saveAll(list);
+                });
             });
         });
         return "입력완료";
@@ -95,7 +97,8 @@ public class SummonerService {
     }
 
     public YdSummoner insertAndSelectSummoner(String summonerName) {
-        return getYdSummoner(getOneSummonerInfoUrl(getSummonerDto(getOneSummonerUrl(summonerName)).getId()));
+        ydSummonerRepository.saveAll(getleagueEntryDTOArrayList(getSummonerInfoUrl(getSummonerDto(getOneSummonerUrl(summonerName)).getId())));
+        return new YdSummoner();
     }
 
 }

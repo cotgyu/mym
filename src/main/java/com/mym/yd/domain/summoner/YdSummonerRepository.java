@@ -10,6 +10,6 @@ import java.util.Optional;
 
 public interface YdSummonerRepository extends JpaRepository<YdSummoner, String> {
 
-    @Query("SELECT y FROM YdSummoner y WHERE y.summonerName = :summonerName")
+    @Query("SELECT y FROM YdSummoner y WHERE y.summonerName = :summonerName and y.queueType = 'RANKED_SOLO_5x5'")
     Optional<YdSummoner> findByName(@Param("summonerName") String summonerName);
 }
