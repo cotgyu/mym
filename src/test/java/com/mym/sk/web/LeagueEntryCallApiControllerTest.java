@@ -4,6 +4,7 @@ import com.mym.base.controller.BaseControllerTest;
 import com.mym.sk.domains.leagueEntry.LeagueEntryRepository;
 import com.mym.sk.web.dto.LeagueEntryRequestDto;
 import jdk.jfr.Description;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -22,7 +23,7 @@ class LeagueEntryCallApiControllerTest extends BaseControllerTest {
     private LeagueEntryRepository leagueEntryRepository;
 
     @Test
-    @Description("apiCallController 테스트")
+    @DisplayName("apiCallController - entries 저장 테스트")
     public void entriesApiCallAndCheckResultSizeTest() throws Exception {
 
         //given
