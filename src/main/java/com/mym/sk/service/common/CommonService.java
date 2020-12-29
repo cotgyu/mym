@@ -1,11 +1,14 @@
 package com.mym.sk.service.common;
 
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -18,11 +21,21 @@ public class CommonService {
 
     private final RestTemplate restTemplate;
 
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
     @Value("${riot_apiKey}")
     private String apiKey;
 
-    // TODO 호출 에러 처리
-    public String getJsonDateFromRiotApi(URI url) {
+    /**
+     * riot api 호출
+     * @param url
+     * @param pathParams
+     * @param queryParams
+     * @return
+     */
+    public String getJsonDateFromRiotApi(String url, Map<String, String> pathParams , MultiValueMap<String, String> queryParams) {
+
+        URI callURI = makeRiotApiURI(url, pathParams, queryParams);
 
         // riot api는 헤더에만 키만 넣고 있어서 파라미터는 불필요
         MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
@@ -33,15 +46,21 @@ public class CommonService {
 
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<MultiValueMap<String, String>>(parameters, headers);
 
+        ResponseEntity<String> responseEntity = restTemplate.exchange(callURI, HttpMethod.GET, requestEntity, String.class);
+        String result = responseEntity.getBody();
 
-        ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
-
-        return responseEntity.getBody();
-
+        return result;
     }
 
 
-    public URI makeRiotApiURI(String url, Map<String, String> pathParams , MultiValueMap<String, String> queryParams){
+    /**
+     * api 호출할 URI 생성
+     * @param url
+     * @param pathParams
+     * @param queryParams
+     * @return
+     */
+    private URI makeRiotApiURI(String url, Map<String, String> pathParams , MultiValueMap<String, String> queryParams){
 
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(url)
                 .queryParams(queryParams);

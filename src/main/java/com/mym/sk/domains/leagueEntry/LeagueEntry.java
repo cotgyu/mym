@@ -4,6 +4,7 @@ package com.mym.sk.domains.leagueEntry;
 import lombok.*;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 @Entity
@@ -14,8 +15,9 @@ import javax.persistence.Id;
 @AllArgsConstructor
 public class LeagueEntry {
 
-    // Player's encrypted summonerId.
-    @Id
+    @Id @GeneratedValue
+    Long pkId;
+
     String summonerId;
 
     String leagueId;

@@ -3,6 +3,7 @@ package com.mym.sk.web;
 import com.mym.base.controller.BaseControllerTest;
 import com.mym.sk.domains.summoner.Summoner;
 import com.mym.sk.domains.summoner.SummonerRepository;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -21,6 +22,7 @@ class SummonerDetailControllerTest  extends BaseControllerTest {
     private SummonerRepository summonerRepository;
 
     @Test
+    @DisplayName("사용자 이름으로 조회")
     public void summonerDetailTest() throws Exception{
 
         // given

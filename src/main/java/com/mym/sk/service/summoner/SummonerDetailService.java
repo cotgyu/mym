@@ -2,11 +2,12 @@ package com.mym.sk.service.summoner;
 
 import com.mym.sk.domains.summoner.Summoner;
 import com.mym.sk.domains.summoner.SummonerRepository;
-import com.mym.sk.web.dto.SummonerRequestDto;
+import com.mym.sk.web.dto.SummonerResponseDto;
 import com.mym.sk.web.dto.SummonerSaveDto;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -18,17 +19,18 @@ public class SummonerDetailService {
 
     private final ModelMapper modelMapper;
 
-    public SummonerRequestDto getSummonerInfoFromDB(String summonerName){
+    public Optional<SummonerResponseDto> getSummonerDetail(String summonerName){
 
-        SummonerRequestDto summonerRequestDto = new SummonerRequestDto();
+        Optional<Summoner> optionalSummoner = summonerRepository.findByName(summonerName);
 
-        Summoner summoner = summonerRepository.findByName(summonerName).orElseGet(Summoner::new);
+        if(optionalSummoner.isEmpty()){
+            return Optional.empty();
+        }
 
-        modelMapper.map(summoner, summonerRequestDto);
-
-        return summonerRequestDto;
+        return Optional.ofNullable(new SummonerResponseDto(optionalSummoner.get()));
     }
 
+    @Transactional
     public Summoner saveSummonerDetail(SummonerSaveDto summonerSaveDto){
 
         return summonerRepository.save(summonerSaveDto.toEntity());

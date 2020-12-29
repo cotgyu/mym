@@ -7,6 +7,7 @@ import com.mym.sk.web.dto.LeagueEntrySaveDto;
 import jdk.jfr.Description;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -15,10 +16,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.json.JsonParser;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -52,7 +55,7 @@ public class RiotApiTest {
     private String apiKey;
 
     @Test
-    @Description("챔피언 로테이션 api 호출이 되는 지 확인한다.")
+    @DisplayName("챔피언 로테이션 api 호출이 되는 지 확인한다.")
     public void champion_rotation_api_call_test() throws Exception{
         // https://kr.api.riotgames.com/lol/platform/v3/champion-rotations?api_key=RGAPI-13c7e003-66d4-4700-b3d4-3424fdb6a607
 
@@ -82,7 +85,7 @@ public class RiotApiTest {
     }
 
     @Test
-    @Description("티어별 데이터를 받아오는 api 호출-파싱 테스트")
+    @DisplayName("티어별 데이터를 받아오는 api 호출-파싱 테스트")
     public void league_entries_api_call_test() throws Exception {
 
         // https://kr.api.riotgames.com/lol/league/v4/entries/RANKED_SOLO_5x5/DIAMOND/I?page=1
@@ -138,7 +141,7 @@ public class RiotApiTest {
     }
 
     @Test
-    @Description("티어별 데이터를 받아오는 api 호출-파싱 테스트2 gson 사용매")
+    @DisplayName("티어별 데이터를 받아오는 api 호출-파싱 테스트2 gson 사용")
     public void league_entries_api_call_test2() throws Exception {
 
         // https://kr.api.riotgames.com/lol/league/v4/entries/RANKED_SOLO_5x5/DIAMOND/I?page=1
@@ -197,6 +200,45 @@ public class RiotApiTest {
 
         System.out.println(fromJson);
         assertThat(fromJson.size()).isEqualTo(205);
+
+    }
+
+    @Test
+    @DisplayName("잘못된 사용자일 경우 응답 404 확인 테스트")
+    public void summoner404test(){
+
+        // given
+        String summonerName = "야 뚱111234";
+
+        String url = "https://kr.api.riotgames.com/lol/summoner/v4/summoners/by-name/{summonerName}";
+        Map<String, String> pathParams = new HashMap<>();
+        pathParams.put("summonerName", summonerName);
+
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(url);
+
+        URI uri = builder.buildAndExpand(pathParams).encode().toUri();
+
+        // when
+        MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.set("X-Riot-Token", apiKey);
+
+        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<MultiValueMap<String, String>>(parameters, headers);
+
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+
+            ResponseEntity<String> responseEntity = restTemplate.exchange(uri, HttpMethod.GET, requestEntity, String.class);
+
+        } catch (HttpClientErrorException e){
+
+
+            assertThat(e.getRawStatusCode()).isEqualTo(404);
+
+        }
+
 
     }
 

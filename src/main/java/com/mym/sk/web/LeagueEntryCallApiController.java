@@ -22,6 +22,7 @@ import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -50,8 +51,6 @@ public class LeagueEntryCallApiController {
 
     @PostMapping("/entries")
     public ResponseEntity entriesApiCall(@RequestBody LeagueEntryRequestDto leagueEntryRequestDto, Errors errors){
-        Map<String, Object> resultMap = new HashMap<>();
-
 
         leagueEntriesValidator.validate(leagueEntryRequestDto, errors);
 
@@ -71,12 +70,24 @@ public class LeagueEntryCallApiController {
         MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
         queryParams.add("page", Integer.toString(leagueEntryRequestDto.getPage()));
 
-        // uri 생성 공통 메서드
-        URI uri = commonService.makeRiotApiURI(riot_leagueEntriesURL, pathParams, queryParams);
+        Map<String, Object> resultMap = new HashMap<>();
 
-        // api 호출 공통 메서드
-        String resultData = commonService.getJsonDateFromRiotApi(uri);
+        String resultData;
 
+        try{
+            resultData = commonService.getJsonDateFromRiotApi(riot_leagueEntriesURL, pathParams, queryParams);
+        } catch (HttpClientErrorException e){
+
+            logger.error("riot api 호출 에러: "+ e.getMessage());
+
+            if(e.getRawStatusCode() == 400){
+                resultMap.put("message", "잘못된 요청입니다.");
+            } else {
+                resultMap.put("message", "API 호출에 실패하였습니다.");
+            }
+
+            return new ResponseEntity<>(resultMap, HttpStatus.BAD_REQUEST);
+        }
 
         ArrayList<LeagueEntrySaveDto> leagueEntrySaveDtos = gson.fromJson(resultData, new TypeToken<ArrayList<LeagueEntrySaveDto>>(){}.getType());
 
