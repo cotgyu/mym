@@ -16,23 +16,17 @@ public class LeagueEntriesValidator {
         }
 
         if (dto.getDivision() == null || dto.getDivision().equals("")){
-            // field 에러
             errors.rejectValue("division", "wrongValue","division is wrong");
-            // global 에러
             errors.reject("wrongDivision", "Values for division is wrong");
         }
 
         if (dto.getTier() == null || dto.getTier().equals("")){
-            // field 에러
             errors.rejectValue("tier", "wrongValue","tier is wrong");
-            // global 에러
             errors.reject("wrongTier", "Values for tier is wrong");
         }
 
         if (dto.getPage() <= 0){
-            // field 에러
             errors.rejectValue("page", "wrongValue","page is wrong");
-            // global 에러
             errors.reject("wrongPage", "Values for page is wrong");
         }
     }

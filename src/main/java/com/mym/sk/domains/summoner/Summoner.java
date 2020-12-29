@@ -4,6 +4,7 @@ import com.mym.sk.domains.BaseEntity;
 import lombok.*;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 @Entity
@@ -14,7 +15,9 @@ import javax.persistence.Id;
 @AllArgsConstructor
 public class Summoner extends BaseEntity {
 
-    @Id
+    @Id @GeneratedValue
+    Long pkId;
+
     String accountId;
     int profileIconId;
     long revisionDate;

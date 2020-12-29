@@ -15,10 +15,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.json.JsonParser;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -197,6 +199,44 @@ public class RiotApiTest {
 
         System.out.println(fromJson);
         assertThat(fromJson.size()).isEqualTo(205);
+
+    }
+
+    @Test
+    public void summoner404test(){
+
+        // given
+        String summonerName = "야 뚱111234";
+
+        String url = "https://kr.api.riotgames.com/lol/summoner/v4/summoners/by-name/{summonerName}";
+        Map<String, String> pathParams = new HashMap<>();
+        pathParams.put("summonerName", summonerName);
+
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(url);
+
+        URI uri = builder.buildAndExpand(pathParams).encode().toUri();
+
+        // when
+        MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.set("X-Riot-Token", apiKey);
+
+        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<MultiValueMap<String, String>>(parameters, headers);
+
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+
+            ResponseEntity<String> responseEntity = restTemplate.exchange(uri, HttpMethod.GET, requestEntity, String.class);
+
+        } catch (HttpClientErrorException e){
+
+
+            assertThat(e.getRawStatusCode()).isEqualTo(404);
+
+        }
+
 
     }
 
