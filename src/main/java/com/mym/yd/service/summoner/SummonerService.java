@@ -1,16 +1,16 @@
 package com.mym.yd.service.summoner;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationConfig;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mym.yd.domain.summoner.YdSummoner;
 import com.mym.yd.domain.summoner.YdSummonerRepository;
 import com.mym.yd.web.dto.SummonerDto;
 import com.mym.yd.web.dto.SummonerResponseDto;
+import com.mym.yd.web.vo.ParameterVO;
+import com.mym.yd.web.vo.UrlVO;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -21,7 +21,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.*;
 
-@PropertySource("classpath:yd-api-info.properties")
 @Service
 @RequiredArgsConstructor
 public class SummonerService {
@@ -31,29 +30,22 @@ public class SummonerService {
     private HttpHeaders headers;
     private final HttpEntity<?> entity = new HttpEntity<>(headers);
     private final ObjectMapper mapper;
-    @Value("${yd-api-key}")
-    private String apiKey;
-    @Value("${yd-entries-url}")
-    private String entriesUrl;
-    @Value("${yd-summoner-url}")
-    private String summonerUrl;
-    @Value("${yd-queue}")
-    private List<String> queue;
-    @Value("${yd-tier}")
-    private List<String> tier;
-    @Value("${yd-division}")
-    private List<String> division;
+    @Autowired
+    private UrlVO urlVO;
+    @Autowired
+    private ParameterVO parameterVO;
 
-    public String getEntriesUrl(String queue, String tier, String division) {
-        return entriesUrl + queue + tier + division + "?page=" + 1 + "&api_key=" + apiKey;
+
+    public String getEntriesUrl(String queue, String tier, String divisioon) {
+        return urlVO.getEntriesUrl() + queue + tier + divisioon + "?page=" + 1 + "&api_key=" + urlVO.getApiKey();
     }
 
     public String getOneSummonerUrl(String summonerName) {
-        return summonerUrl + "/" + summonerName + "?api_key=" + apiKey;
+        return urlVO.getSummonerUrl() + "/" + summonerName + "?api_key=" + urlVO.getApiKey();
     }
 
     public String getSummonerInfoUrl(String encryptedSummonerId) {
-        return entriesUrl + "/by-summoner/" + encryptedSummonerId + "?api_key=" + apiKey;
+        return urlVO.getEntriesUrl() + "/by-summoner/" + encryptedSummonerId + "?api_key=" + urlVO.getApiKey();
     }
 
     public ArrayList<YdSummoner> getleagueEntryDTOArrayList(String summonerUrl) {
@@ -78,9 +70,10 @@ public class SummonerService {
 
     @Transactional
     public String saveAll() {
-        queue.forEach(queue -> {
-            tier.forEach(tier -> {
-                division.forEach(division -> {
+        parameterVO.getQueue().forEach(queue -> {
+            parameterVO.getTier().forEach(tier -> {
+                parameterVO.getDivision().forEach(division -> {
+                    // 맵으로 설정
                     List list = new ArrayList(getleagueEntryDTOArrayList(getEntriesUrl(queue, tier, division)));
                     ydSummonerRepository.saveAll(list);
                 });
