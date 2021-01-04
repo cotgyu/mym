@@ -4,6 +4,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.mym.sk.web.dto.LeagueEntrySaveDto;
+import com.mym.sk.web.dto.MatchListSaveDto;
+import com.mym.sk.web.dto.MatchReferenceSaveDto;
+import com.mym.sk.web.dto.SummonerSaveDto;
 import jdk.jfr.Description;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -239,6 +242,57 @@ public class RiotApiTest {
 
         }
 
+
+    }
+
+    @Test
+    @DisplayName("사용자의 최근 게임 리스트 불러오기")
+    public void getCurrentGameListTest(){
+
+        //given
+        String summonerId = "vSYohGRoEroSkdswTmTEC_P51jlgtx-Y_hTelH59cXhx";
+
+        String url = "https://kr.api.riotgames.com/lol/match/v4/matchlists/by-account/{encryptedAccountId}";
+
+        Map<String, String> pathParams = new HashMap<>();
+        pathParams.put("encryptedAccountId", summonerId);
+
+        MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+        queryParams.add("beginIndex", "0");
+        queryParams.add("endIndex", "10");
+
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(url).queryParams(queryParams);
+
+        URI uri = builder.buildAndExpand(pathParams).encode().toUri();
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.set("X-Riot-Token", apiKey);
+
+        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<MultiValueMap<String, String>>(parameters, headers);
+
+
+        // when
+        ResponseEntity<String> responseEntity = restTemplate.exchange(uri, HttpMethod.GET, requestEntity, String.class);
+
+        String body = responseEntity.getBody();
+
+
+
+        // then
+        Gson gson = new Gson();
+        MatchListSaveDto saveDto = gson.fromJson(body, new TypeToken<MatchListSaveDto>(){}.getType());
+
+        assertThat(saveDto.getStartIndex()).isEqualTo(0);
+        assertThat(saveDto.getEndIndex()).isEqualTo(10);
+
+
+        ArrayList<MatchReferenceSaveDto> matches = saveDto.getMatches();
+        assertThat(matches.get(0).getSeason()).isEqualTo(13);
 
     }
 
