@@ -34,5 +34,4 @@ public class LeagueEntry {
     boolean freshBlood;
     boolean inactive;
 
-    // TODO 연관관계 매핑
 }

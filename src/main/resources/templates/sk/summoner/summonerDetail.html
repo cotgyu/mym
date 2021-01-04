@@ -16,6 +16,19 @@
 <h4 th:text="'summonerId : '+ ${summonerDetail.id}" />
 
 
+<br>
+
+<th:block th:if="not ${#lists.isEmpty(matchReferences)}">
+
+
+
+    <div th:each="match : ${matchReferences}">
+        <h3 th:text="'게임 ID : '+${match.getGameId()}+' / 챔피언 ID : '+${match.getChampion()}+' / 역할: '+${match.getRole()}"></h3>
+    </div>
+
+</th:block>
+
+
 
 <!--부트스트랩 js, jquery 추가-->
 <script src="/js/lib/jquery.min.js"></script>

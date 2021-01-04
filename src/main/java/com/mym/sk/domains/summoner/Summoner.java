@@ -1,11 +1,12 @@
 package com.mym.sk.domains.summoner;
 
 import com.mym.sk.domains.BaseEntity;
+import com.mym.sk.domains.matchList.MatchReference;
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -16,6 +17,7 @@ import javax.persistence.Id;
 public class Summoner extends BaseEntity {
 
     @Id @GeneratedValue
+    @Column(name = "summoner_id")
     Long pkId;
 
     String accountId;
@@ -29,5 +31,6 @@ public class Summoner extends BaseEntity {
     String puuid;
     long summonerLevel;
 
-    // TODO 연관관계 매핑
+    @OneToMany(mappedBy = "summoner")
+    private List<MatchReference> matchReferences = new ArrayList<>();
 }

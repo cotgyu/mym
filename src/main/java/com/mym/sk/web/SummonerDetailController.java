@@ -1,9 +1,13 @@
 package com.mym.sk.web;
 
 import com.google.gson.Gson;
+import com.mym.sk.domains.matchList.MatchReference;
 import com.mym.sk.domains.summoner.Summoner;
 import com.mym.sk.service.common.CommonService;
+import com.mym.sk.service.matchList.MatchListService;
 import com.mym.sk.service.summoner.SummonerDetailService;
+import com.mym.sk.web.dto.MatchListResponseDto;
+import com.mym.sk.web.dto.MatchListSaveDto;
 import com.mym.sk.web.dto.SummonerResponseDto;
 import com.mym.sk.web.dto.SummonerSaveDto;
 import lombok.RequiredArgsConstructor;
@@ -24,9 +28,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
@@ -40,6 +43,8 @@ public class SummonerDetailController {
 
     private final CommonService commonService;
 
+    private final MatchListService matchListService;
+
     private final Gson gson;
 
     private final ModelMapper modelMapper;
@@ -47,15 +52,24 @@ public class SummonerDetailController {
     @Value("${riot_getSummonerInfoURL}")
     private String riot_getSummonerInfoURL;
 
+    @Value("${riot_getSummonerMatchList}")
+    private String riot_getSummonerMatchList;
 
-    // TODO 매치정보 call - 사용자랑 연관관계 매핑
+
     @GetMapping("/search/{summonerName}")
     public String getSummonerInfo(Model model, @PathVariable String summonerName){
 
         Optional<SummonerResponseDto> optionalDto = summonerDetailService.getSummonerDetail(summonerName);
 
         if(optionalDto.isPresent()){
-            model.addAttribute("summonerDetail", optionalDto.get());
+            SummonerResponseDto summonerResponseDto = optionalDto.get();
+
+            List<MatchListResponseDto> matchListResponseDtos = summonerResponseDto.getMatchReferences().stream()
+                    .map(MatchReference -> new MatchListResponseDto(MatchReference))
+                    .collect(Collectors.toList());
+
+            model.addAttribute("summonerDetail", summonerResponseDto);
+            model.addAttribute("matchReferences", matchListResponseDtos);
 
             return "sk/summoner/summonerDetail";
         }
@@ -84,7 +98,45 @@ public class SummonerDetailController {
 
         Summoner summoner = summonerDetailService.saveSummonerDetail( gson.fromJson(resultData, new TypeToken<SummonerSaveDto>(){}.getType()) );
 
+        // TODO 자세한 승패정보 호출 후 매핑 필요
+        // match List 조회
+        pathParams = new HashMap<>();
+        pathParams.put("encryptedAccountId", summoner.getAccountId());
+
+        queryParams = new LinkedMultiValueMap<>();
+        queryParams.add("beginIndex", "0");
+        queryParams.add("endIndex", "10");
+
+        String matchListData;
+
+        // TODO 중복코드 제거 고려
+        try {
+            matchListData = commonService.getJsonDateFromRiotApi(riot_getSummonerMatchList, pathParams, queryParams);
+        } catch (HttpClientErrorException e){
+
+            logger.error("riot api 호출 에러: "+ e.getMessage());
+
+            if(e.getRawStatusCode() == 404){
+                model.addAttribute("exception", "매치정보를 찾을 수 없습니다.");
+            } else {
+                model.addAttribute("exception", "API 호출에 실패하였습니다.");
+            }
+
+            return "exception";
+        }
+
+        MatchListSaveDto dto = gson.fromJson(matchListData, new TypeToken<MatchListSaveDto>(){}.getType());
+
+
+        List<MatchReference> matchReferences = matchListService.saveMatchReferenceList(summoner, dto);
+
+        List<MatchListResponseDto> matchListResponseDtos = matchReferences.stream()
+                .map(MatchReference -> new MatchListResponseDto(MatchReference))
+                .collect(Collectors.toList());
+
+
         model.addAttribute("summonerDetail", new SummonerResponseDto(summoner));
+        model.addAttribute("matchReferences", matchListResponseDtos);
 
         return "sk/summoner/summonerDetail";
     }

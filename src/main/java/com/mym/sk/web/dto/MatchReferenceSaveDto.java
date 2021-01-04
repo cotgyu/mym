@@ -1,6 +1,8 @@
 package com.mym.sk.web.dto;
 
 
+import com.mym.sk.domains.matchList.MatchReference;
+import com.mym.sk.domains.summoner.Summoner;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -16,4 +18,17 @@ public class MatchReferenceSaveDto {
     int queue;
     String lane;
     long timestamp;
+
+    public MatchReference toEntity(){
+        return MatchReference.builder()
+                .gameId(gameId)
+                .role(role)
+                .season(season)
+                .platformId(platformId)
+                .champion(champion)
+                .queue(queue)
+                .lane(lane)
+                .timestamp(timestamp)
+                .build();
+    }
 }

@@ -1,8 +1,12 @@
 package com.mym.sk.web.dto;
 
+import com.mym.sk.domains.matchList.MatchReference;
 import com.mym.sk.domains.summoner.Summoner;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -19,6 +23,8 @@ public class SummonerResponseDto {
     String puuid;
     long summonerLevel;
 
+    private List<MatchReference> matchReferences = new ArrayList<>();
+
     public SummonerResponseDto(Summoner entity){
         this.accountId = entity.getAccountId();
         this.profileIconId = entity.getProfileIconId();
@@ -27,6 +33,7 @@ public class SummonerResponseDto {
         this.id = entity.getId();
         this.puuid = entity.getPuuid();
         this.summonerLevel = entity.getSummonerLevel();
+        this.matchReferences = entity.getMatchReferences();
     }
 
 }
