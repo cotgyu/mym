@@ -1,6 +1,5 @@
 package com.mym.yd.domain.summoner;
 
-import com.mym.yd.web.dto.MiniSeriesDTO;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

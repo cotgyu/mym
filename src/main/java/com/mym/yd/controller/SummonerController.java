@@ -1,12 +1,10 @@
 package com.mym.yd.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.mym.yd.web.dto.SummonerResponseDto;
 import com.mym.yd.service.summoner.SummonerService;
+import com.mym.yd.web.dto.SummonerResponseDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -38,11 +36,16 @@ public class SummonerController {
 
     @GetMapping("/selectOneSummoner")
     public SummonerResponseDto selectOneSummoner() {
-          return summonerService.findByName("야 뚱");
+        return summonerService.findByName("야 뚱");
     }
 
     @GetMapping("/insertSummoner")
     public void insertSummoner() {
         summonerService.saveAll();
+    }
+
+    @GetMapping("/insertSummonerAccountInfo")
+    public void insertSummonerAccountInfo() {
+        summonerService.getAndSaveAccountInfo();
     }
 }

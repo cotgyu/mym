@@ -3,6 +3,8 @@ package com.mym.yd.service.summoner;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mym.yd.domain.summoner.SummonerAccountInfo;
+import com.mym.yd.domain.summoner.SummonerAccountInfoRepository;
 import com.mym.yd.domain.summoner.YdSummoner;
 import com.mym.yd.domain.summoner.YdSummonerRepository;
 import com.mym.yd.web.dto.SummonerDto;
@@ -26,6 +28,7 @@ import java.util.*;
 public class SummonerService {
 
     private final YdSummonerRepository ydSummonerRepository;
+    private final SummonerAccountInfoRepository summonerAccountInfoRepository;
     private final RestTemplate restTemplate;
     private HttpHeaders headers;
     private final HttpEntity<?> entity = new HttpEntity<>(headers);
@@ -48,6 +51,10 @@ public class SummonerService {
         return urlVO.getEntriesUrl() + "/by-summoner/" + encryptedSummonerId + "?api_key=" + urlVO.getApiKey();
     }
 
+    public String getSummonerAccountInfoUrl(String encryptedSummonerId) {
+        return urlVO.getSummonerAccountInfoUrl() + "/" + encryptedSummonerId + "?api_key=" + urlVO.getApiKey();
+    }
+
     public ArrayList<YdSummoner> getleagueEntryDTOArrayList(String summonerUrl) {
 
         /**
@@ -60,12 +67,18 @@ public class SummonerService {
                 ), new TypeReference<ArrayList<YdSummoner>>() {});
     }
 
+
+
     public SummonerDto getSummonerDto(String url) {
         return restTemplate.exchange(UriComponentsBuilder.fromHttpUrl(url).build().toString(), HttpMethod.GET, entity, SummonerDto.class).getBody();
     }
 
     public YdSummoner getYdSummoner(String url) {
         return restTemplate.exchange(UriComponentsBuilder.fromHttpUrl(url).build().toString(), HttpMethod.GET, entity, YdSummoner.class).getBody();
+    }
+
+    public SummonerAccountInfo getSummonerAccountInfo(String url) {
+        return restTemplate.exchange(UriComponentsBuilder.fromHttpUrl(url).build().toString(), HttpMethod.GET, entity, SummonerAccountInfo.class).getBody();
     }
 
     @Transactional
@@ -93,5 +106,20 @@ public class SummonerService {
         ydSummonerRepository.saveAll(getleagueEntryDTOArrayList(getSummonerInfoUrl(getSummonerDto(getOneSummonerUrl(summonerName)).getId())));
         return new YdSummoner();
     }
+
+    public void getAndSaveAccountInfo() {
+        List<SummonerAccountInfo> list = new ArrayList<SummonerAccountInfo>();
+        ydSummonerRepository.findAll().forEach(summonerId ->{
+            try {
+                Thread.sleep(1200);
+
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            list.add(getSummonerAccountInfo(getSummonerAccountInfoUrl(summonerId.getSummonerId())));
+        });
+        summonerAccountInfoRepository.saveAll(list);
+    }
+
 
 }

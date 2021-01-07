@@ -1,9 +1,6 @@
 package com.mym.yd.web.vo;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
@@ -18,4 +15,6 @@ public class UrlVO {
     private String entriesUrl;
     @Value("${yd-summoner-url}")
     private String summonerUrl;
+    @Value("${yd-summoner-account-info-url}")
+    private String summonerAccountInfoUrl;
 }
