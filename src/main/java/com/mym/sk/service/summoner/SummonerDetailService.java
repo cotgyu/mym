@@ -17,8 +17,6 @@ public class SummonerDetailService {
 
     private final SummonerRepository summonerRepository;
 
-    private final ModelMapper modelMapper;
-
     public Optional<SummonerResponseDto> getSummonerDetail(String summonerName){
 
         Optional<Summoner> optionalSummoner = summonerRepository.findByName(summonerName);

@@ -18,12 +18,12 @@
 
 <br>
 
-<th:block th:if="not ${#lists.isEmpty(matchReferences)}">
+<th:block th:if="not ${#lists.isEmpty(matchDetailList)}">
 
 
 
-    <div th:each="match : ${matchReferences}">
-        <h3 th:text="'게임 ID : '+${match.getGameId()}+' / 챔피언 ID : '+${match.getChampion()}+' / 역할: '+${match.getRole()}"></h3>
+    <div th:each="match : ${matchDetailList}">
+        <h3 th:text="'게임 ID : '+${match.getGameId()}+' / 챔피언 ID : '+${match.getChampion()}+' / 역할: '+${match.getRole()}+' / 승패: '+${match.getWin()}+' / 킬: '+${match.getKills()}+' / 데스: '+${match.getDeaths()}+' / 어시스트: '+${match.getAssists()}"></h3>
     </div>
 
 </th:block>

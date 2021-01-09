@@ -1,15 +1,17 @@
 package com.mym.sk.web;
 
 import com.google.gson.Gson;
+import com.mym.sk.domains.match.MatchDetail;
+import com.mym.sk.domains.match.ParticipantDetail;
+import com.mym.sk.domains.match.ParticipantIdentityDetail;
+import com.mym.sk.domains.match.TeamStatsDetail;
 import com.mym.sk.domains.matchList.MatchReference;
 import com.mym.sk.domains.summoner.Summoner;
 import com.mym.sk.service.common.CommonService;
+import com.mym.sk.service.matchDetail.MatchDetailService;
 import com.mym.sk.service.matchList.MatchListService;
 import com.mym.sk.service.summoner.SummonerDetailService;
-import com.mym.sk.web.dto.MatchListResponseDto;
-import com.mym.sk.web.dto.MatchListSaveDto;
-import com.mym.sk.web.dto.SummonerResponseDto;
-import com.mym.sk.web.dto.SummonerSaveDto;
+import com.mym.sk.web.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -45,6 +47,8 @@ public class SummonerDetailController {
 
     private final MatchListService matchListService;
 
+    private final MatchDetailService matchDetailService;
+
     private final Gson gson;
 
     private final ModelMapper modelMapper;
@@ -54,6 +58,9 @@ public class SummonerDetailController {
 
     @Value("${riot_getSummonerMatchList}")
     private String riot_getSummonerMatchList;
+
+    @Value("${riot_getMatchDetail}")
+    private String riot_getMatchDetail;
 
 
     @GetMapping("/search/{summonerName}")
@@ -68,8 +75,14 @@ public class SummonerDetailController {
                     .map(MatchReference -> new MatchListResponseDto(MatchReference))
                     .collect(Collectors.toList());
 
+
+            List<MatchReference> matchReferences = summonerResponseDto.getMatchReferences();
+
+            List<SummonerMatchListResponseDto> matchDetailList = matchDetailService.getMatchDetailList(matchReferences, summonerResponseDto);
+
+
             model.addAttribute("summonerDetail", summonerResponseDto);
-            model.addAttribute("matchReferences", matchListResponseDtos);
+            model.addAttribute("matchDetailList", matchDetailList);
 
             return "sk/summoner/summonerDetail";
         }
@@ -97,8 +110,8 @@ public class SummonerDetailController {
         }
 
         Summoner summoner = summonerDetailService.saveSummonerDetail( gson.fromJson(resultData, new TypeToken<SummonerSaveDto>(){}.getType()) );
+        model.addAttribute("summonerDetail", new SummonerResponseDto(summoner));
 
-        // TODO 자세한 승패정보 호출 후 매핑 필요
         // match List 조회
         pathParams = new HashMap<>();
         pathParams.put("encryptedAccountId", summoner.getAccountId());
@@ -110,6 +123,7 @@ public class SummonerDetailController {
         String matchListData;
 
         // TODO 중복코드 제거 고려
+        // TODO 다중 호출 에러 처리
         try {
             matchListData = commonService.getJsonDateFromRiotApi(riot_getSummonerMatchList, pathParams, queryParams);
         } catch (HttpClientErrorException e){
@@ -134,9 +148,85 @@ public class SummonerDetailController {
                 .map(MatchReference -> new MatchListResponseDto(MatchReference))
                 .collect(Collectors.toList());
 
+        // TODO 중복 코드 제거
+        // 매치 정보 가져오기
+        List<MatchDetail> matchDetailList = new ArrayList<>();
 
-        model.addAttribute("summonerDetail", new SummonerResponseDto(summoner));
-        model.addAttribute("matchReferences", matchListResponseDtos);
+        List<SummonerMatchListResponseDto> matchListResponseDtoList = new ArrayList<>();
+
+        for (MatchListResponseDto matchListResponseDto : matchListResponseDtos) {
+
+            pathParams = new HashMap<>();
+            pathParams.put("matchId", Long.toString(matchListResponseDto.getGameId()));
+
+            queryParams = new LinkedMultiValueMap<>();
+
+            String matchDetailData = commonService.getJsonDateFromRiotApi(riot_getMatchDetail, pathParams, queryParams);
+
+            MatchDetail matchDetail = gson.fromJson(matchDetailData, new TypeToken<MatchDetail>(){}.getType());
+
+            matchDetailList.add(matchDetail);
+
+
+            List<ParticipantIdentityDetail> participantIdentities = matchDetail.getParticipantIdentities();
+
+            int participantId = 0;
+
+            for (ParticipantIdentityDetail participantIdentity : participantIdentities) {
+                if(participantIdentity.getPlayer().getAccountId().equals(summoner.getAccountId())){
+
+                    participantId = participantIdentity.getParticipantId();
+
+                    break;
+                }
+            }
+
+            int kill = -1;
+            int deaths = -1;
+            int assists = -1;
+
+            List<ParticipantDetail> participants = matchDetail.getParticipants();
+
+            for (ParticipantDetail participant : participants) {
+
+                if(participant.getParticipantId() == participantId){
+                    kill = participant.getStats().getKills();
+                    deaths = participant.getStats().getDeaths();
+                    assists = participant.getStats().getAssists();
+
+                    break;
+                }
+
+            }
+
+            int teamId = 100;
+            if(participantId > 5){
+                teamId = 200;
+            }
+
+            String win = "";
+
+            List<TeamStatsDetail> teams = matchDetail.getTeams();
+            for (TeamStatsDetail team : teams) {
+
+                if(team.getTeamId() == teamId){
+                    win = team.getWin();
+
+                    break;
+                }
+
+            }
+
+            matchListResponseDtoList.add(new SummonerMatchListResponseDto(
+                    matchListResponseDto.getGameId(), matchListResponseDto.getChampion(), matchListResponseDto.getRole(), win, kill, deaths, assists));
+        }
+
+        matchDetailService.saveMatchDetail(matchDetailList);
+
+
+        model.addAttribute("matchDetailList", matchListResponseDtoList);
+
+
 
         return "sk/summoner/summonerDetail";
     }
