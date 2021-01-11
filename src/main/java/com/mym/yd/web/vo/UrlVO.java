@@ -17,4 +17,6 @@ public class UrlVO {
     private String summonerUrl;
     @Value("${yd-summoner-account-info-url}")
     private String summonerAccountInfoUrl;
+    @Value("${yd-match-matchlists}")
+    private String matchlistsUrl;
 }

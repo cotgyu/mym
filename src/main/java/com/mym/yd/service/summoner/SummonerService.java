@@ -67,8 +67,6 @@ public class SummonerService {
                 ), new TypeReference<ArrayList<YdSummoner>>() {});
     }
 
-
-
     public SummonerDto getSummonerDto(String url) {
         return restTemplate.exchange(UriComponentsBuilder.fromHttpUrl(url).build().toString(), HttpMethod.GET, entity, SummonerDto.class).getBody();
     }
@@ -102,8 +100,15 @@ public class SummonerService {
         return new SummonerResponseDto(entity);
     }
 
+    @Transactional
     public YdSummoner insertAndSelectSummoner(String summonerName) {
-        ydSummonerRepository.saveAll(getleagueEntryDTOArrayList(getSummonerInfoUrl(getSummonerDto(getOneSummonerUrl(summonerName)).getId())));
+
+        SummonerDto summonerDto = getSummonerDto(getOneSummonerUrl(summonerName));
+        SummonerAccountInfo summonerAccountInfo = getSummonerAccountInfo(getSummonerAccountInfoUrl(summonerDto.getId()));
+
+        ydSummonerRepository.saveAll(getleagueEntryDTOArrayList(getSummonerInfoUrl(summonerDto.getId())));
+        summonerAccountInfoRepository.save(summonerAccountInfo);
+
         return new YdSummoner();
     }
 
