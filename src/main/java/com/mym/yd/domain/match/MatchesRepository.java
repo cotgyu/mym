@@ -1,4 +1,4 @@
-package com.mym.yd.domain.matches;
+package com.mym.yd.domain.match;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

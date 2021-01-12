@@ -7,6 +7,7 @@ import com.mym.yd.domain.summoner.SummonerAccountInfo;
 import com.mym.yd.domain.summoner.SummonerAccountInfoRepository;
 import com.mym.yd.domain.summoner.YdSummoner;
 import com.mym.yd.domain.summoner.YdSummonerRepository;
+import com.mym.yd.service.matches.MatchesService;
 import com.mym.yd.web.dto.SummonerDto;
 import com.mym.yd.web.dto.SummonerResponseDto;
 import com.mym.yd.web.vo.ParameterVO;
@@ -29,6 +30,7 @@ public class SummonerService {
 
     private final YdSummonerRepository ydSummonerRepository;
     private final SummonerAccountInfoRepository summonerAccountInfoRepository;
+    private final MatchesService matchesService;
     private final RestTemplate restTemplate;
     private HttpHeaders headers;
     private final HttpEntity<?> entity = new HttpEntity<>(headers);
@@ -108,6 +110,7 @@ public class SummonerService {
 
         ydSummonerRepository.saveAll(getleagueEntryDTOArrayList(getSummonerInfoUrl(summonerDto.getId())));
         summonerAccountInfoRepository.save(summonerAccountInfo);
+        matchesService.saveAll(summonerAccountInfo.getAccountId());
 
         return new YdSummoner();
     }
