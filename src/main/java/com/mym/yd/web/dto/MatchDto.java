@@ -1,5 +1,6 @@
 package com.mym.yd.web.dto;
 
+import com.mym.yd.domain.match.Match;
 import lombok.Getter;
 
 import java.util.List;
@@ -19,4 +20,20 @@ public class MatchDto {
     private int mapId;
     private String gameMode;
     private List<ParticipantDto> participants;
+
+    public Match toEntity() {
+        return Match.builder()
+                .gameId(gameId)
+                .queueId(queueId)
+                .gameType(gameType)
+                .gameDuration(gameDuration)
+                .platformId(platformId)
+                .gameCreation(gameCreation)
+                .seasonId(seasonId)
+                .gameVersion(gameVersion)
+                .mapId(mapId)
+                .gameMode(gameMode)
+                .build();
+    }
+
 }
