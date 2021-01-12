@@ -8,7 +8,7 @@ import java.util.List;
 @Getter
 public class MatchDto {
     private long gameId;
-    private List<ParticipantIdentityDto> participantList;
+    private List<ParticipantIdentityDto> participantIdentities;
     private int queueId;
     private String gameType;
     private long gameDuration;

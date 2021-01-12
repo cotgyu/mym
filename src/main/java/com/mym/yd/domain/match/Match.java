@@ -30,10 +30,9 @@ public class Match extends BaseTimeEntity {
     private String gameMode;
 
     @Builder
-    public Match(long id, long gameId, int queueId, String gameType, long gameDuration,
+    public Match(long gameId, int queueId, String gameType, long gameDuration,
                  String platformId, long gameCreation, int seasonId, String gameVersion,
                  int mapId, String gameMode) {
-        this.id = id;
         this.gameId = gameId;
         this.queueId = queueId;
         this.gameType = gameType;
